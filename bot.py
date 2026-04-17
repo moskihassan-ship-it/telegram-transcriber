@@ -14,16 +14,13 @@ logging.basicConfig(level=logging.INFO)
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 Hello! Send me a voice message, audio file, or video and I will transcribe it to text for you."
     )
 
-
 async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
-
     if message.voice:
         file = await message.voice.get_file()
         ext = "ogg"
@@ -48,7 +45,6 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     status_msg = await message.reply_text("⏳ Transcribing... please wait.")
-
     file_path = f"/tmp/{file.file_id}.{ext}"
     await file.download_to_drive(file_path)
 
@@ -70,7 +66,6 @@ async def handle_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if os.path.exists(file_path):
             os.remove(file_path)
 
-
 def main():
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
@@ -80,8 +75,7 @@ def main():
         handle_media
     ))
     print("Bot is running...")
-    app.run_polling()
-
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()
